@@ -5,6 +5,8 @@ var Vibe = require('ui/vibe');
 
 var LAT_VAR = '[[latitude]]';
 var LON_VAR = '[[longitude]]';
+var POST_VAR = '[[POST]]';
+
 
 var locationOptions = {
     enableHighAccuracy: true, 
@@ -12,20 +14,25 @@ var locationOptions = {
     timeout: 10000
 };
 
-var urls = Settings.option("urls");
-// var urls = [
-//     {
-//         key: 1,
-//         title: "Test",
-//         url: "https://test.com"
-//     },
-//     {
-//         key: 1,
-//         title: "Test2",
-//         url: "https://test.com"
-//     }
-// ];
-// Settings.option("urls", urls);
+//var urls = Settings.option("urls");
+ var urls = [
+     {
+         key: 1,
+         title: "Test",
+         url: "https://test.com"
+     },
+     {
+         key: 1,
+         title: "No Post",
+         url: "https://test.com"
+     },
+     {
+         key: 1,
+         title: "Using Post",
+         url: "https://test.com[[POST]]"
+     }
+ ];
+ Settings.option("urls", urls);
 var urlMenu = null;
 var responseCard = null;
 
@@ -37,9 +44,19 @@ function contains(str1, str2) {
 }
 
 function ajaxRequest(url) {
+  ajaxRequestMethod(url, 'get');
+}
+
+function ajaxRequestPost(url){
+  ajaxRequestMethod(url, 'post');
+}
+
+function ajaxRequestMethod(url, method) {
+  
     ajax(
         { 
-            url: url
+            url: url,
+            method: method,
         },
         function(data, status, request) {
             Vibe.vibrate('long');
@@ -81,7 +98,12 @@ function showMenu() {
                         });    
                         responseCard.show();
                     }, locationOptions);
-            } else {
+            }
+          else if(contains(url, POST_VAR)){
+              url = url.replace(POST_VAR, '');
+              ajaxRequestPost(url);
+            }
+          else {
                 ajaxRequest(url);
             }  
         });
@@ -138,5 +160,4 @@ function main() {
 }
 
 main();
-
 
